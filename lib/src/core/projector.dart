@@ -253,9 +253,8 @@ class Projector {
       _vertexCount = 0;
 
       if ( object is Mesh ) {
-
-        geometry = object.geometry;
-        geometryMaterials = object.geometry.materials;
+        geometry = (object as Mesh).geometry;
+        geometryMaterials = (object as Mesh).geometry.materials;
         vertices = geometry.vertices;
         faces = geometry.faces;
         faceVertexUvs = geometry.faceVertexUvs;
@@ -263,8 +262,8 @@ class Projector {
         extractRotation( object.matrixRotationWorld, modelMatrix );
         rotationMatrix = object.matrixRotationWorld;
 
-        isFaceMaterial = (object.material is MeshFaceMaterial);
-        side = object.material.side;
+        isFaceMaterial = ((object as Mesh).material is MeshFaceMaterial);
+        side = (object as Mesh).material.side;
 
         vertices.forEach((Vector3 v) {
           _vertex = getNextVertexInPool();
@@ -286,7 +285,7 @@ class Projector {
 
           face = faces[ f ];
 
-          material = isFaceMaterial == true ? geometryMaterials[ face.materialIndex ] : object.material;
+          material = isFaceMaterial == true ? geometryMaterials[ face.materialIndex ] : (object as Mesh).material;
 
           if ( material == null ) continue;
 
@@ -372,7 +371,7 @@ class Projector {
       } else if ( object is Line ) {
         _modelViewProjectionMatrix = _viewProjectionMatrix * modelMatrix;
 
-        vertices = object.geometry.vertices;
+        vertices = (object as Line).geometry.vertices;
 
         v1 = getNextVertexInPool();
         Vector3 vec = vertices[ 0 ];
@@ -380,7 +379,7 @@ class Projector {
         _modelViewProjectionMatrix.transform( v1.positionScreen );
 
       // Handle LineStrip and LinePieces
-        var step = object.type == LinePieces ? 2 : 1;
+        var step = (object as Line).type == LinePieces ? 2 : 1;
 
         vl = vertices.length;
         for ( v = 1; v < vl; v++ ) {
@@ -408,7 +407,7 @@ class Projector {
 
             _line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
-            _line.material = object.material;
+            _line.material = (object as Line).material;
 
             _renderData.elements.add( _line );
           }
@@ -439,7 +438,7 @@ class Projector {
           _particle.scale.x = object.scale.x * ( _particle.x - ( _vector4.x + camera.projectionMatrix[0] ) / ( _vector4.w + camera.projectionMatrix[12] ) ).abs();
           _particle.scale.y = object.scale.y * ( _particle.y - ( _vector4.y + camera.projectionMatrix[5] ) / ( _vector4.w + camera.projectionMatrix[13] ) ).abs();
 
-          _particle.material = object.material as Material;
+          _particle.material = (object as Particle).material as Material;
 
           _renderData.elements.add( _particle );
         }
